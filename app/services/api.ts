@@ -96,11 +96,21 @@ class ApiService {
             headers,
         });
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            console.error('API Response parsing error:', e);
+            data = null;
+        }
 
         if (!response.ok) {
-            console.error('API Error Response:', data); // Debug için
-            const error = new Error('API request failed') as any;
+            console.error('API Error Response:', {
+                status: response.status,
+                statusText: response.statusText,
+                data: data
+            });
+            const error = new Error(data?.detail || 'API request failed') as any;
             error.response = response;
             error.data = data;
             throw error;
